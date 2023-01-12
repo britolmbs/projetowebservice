@@ -28,6 +28,8 @@ public class Order implements Serializable {
     @OneToMany(mappedBy = "id.order")
     private Set<OrderItem> items = new HashSet<>();
 
+  private Payment payment;
+
     public Order (){
 
     }
@@ -53,6 +55,15 @@ public class Order implements Serializable {
 
     public void setMoment(Instant moment) {
         this.moment = moment;
+    }
+
+    @OneToOne(mappedBy = "order", cascade = CascadeType.ALL)
+    public Payment getPayment() {
+        return payment;
+    }
+
+    public void setPayment(Payment payment) {
+        this.payment = payment;
     }
 
     public OrderStatus getOrderStatus() {
