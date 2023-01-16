@@ -2,9 +2,13 @@ package com.britolmbs.projetowebservice.services;
 
 import com.britolmbs.projetowebservice.entities.User;
 import com.britolmbs.projetowebservice.repositories.UserRepository;
+import com.britolmbs.projetowebservice.services.exceptions.DatabaseException;
 import com.britolmbs.projetowebservice.services.exceptions.ResourceNotFoundException;
+import jakarta.persistence.EntityNotFoundException;
 import org.apache.juli.logging.Log;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -27,13 +31,22 @@ public class UserService {
         return repository.save(obj);
     }
     public void delete(Long id) {
-        repository.deleteById(id);
+         try { repository.deleteById(id);}
+         catch (EmptyResultDataAccessException e){
+             throw  new ResourceNotFoundException(id);
+         } catch (DataIntegrityViolationException e) {
+            throw new DatabaseException(e.getMessage());
+         }
     }
 
     public User update(Long id, User obj) {
-        User entity = repository.getReferenceById(id);
-        updateData(entity, obj);
-        return repository.save(entity);
+        try {
+            User entity = repository.getReferenceById(id);
+            updateData(entity, obj);
+            return repository.save(entity);
+        }catch (EntityNotFoundException e){
+            throw new ResourceNotFoundException(id);
+        }
 
     }
 
